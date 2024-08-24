@@ -1,15 +1,19 @@
 package com.meusboleto.backend.rest;
 
+import com.meusboleto.backend.DTO.UserDTO;
 import com.meusboleto.backend.model.User;
 import com.meusboleto.backend.repository.UserRepository;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,22 +26,27 @@ public class UserController {
     private ModelMapper mapper;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        List<UserDTO> userList = users.stream().map(e -> mapper.map(e, UserDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(userList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable int id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable int id) {
         Optional<User> user = userRepository.findById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return user.map(e -> {
+            UserDTO userDTO = mapper.map(e, UserDTO.class);
+            return ResponseEntity.ok(userDTO);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         User u = mapper.map(user, User.class);
-        userRepository.save(u);
-        Optional<User> usu = userRepository.findById(u.getId());
-        return mapper.map(usu, User.class);
+        User usu = mapper.map(userRepository.save(u), User.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usu) ;
     }
 
     @PutMapping("/{id}")

@@ -1,13 +1,20 @@
 package com.meusboleto.backend.rest;
 
+import com.meusboleto.backend.DTO.CategoryDTO;
+import com.meusboleto.backend.DTO.UserDTO;
 import com.meusboleto.backend.model.Category;
 import com.meusboleto.backend.repository.CategoryRepository;
+import com.meusboleto.backend.repository.UserRepository;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -16,15 +23,28 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    private UserRepository userRepository;
+
+    @Autowired
+    private ModelMapper mapper;
+
     @GetMapping
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+
+        List<CategoryDTO> categoryDTO = categories.stream().map( e -> mapper.map(e, CategoryDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(categoryDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable int id) {
-        Optional<Category> category = categoryRepository.findById(id);
-        return category.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable int id) {
+        Optional<Category> categoryOptional = categoryRepository.findById(id);
+        if (categoryOptional.isPresent()) {
+            CategoryDTO categoryDTO = mapper.map(categoryOptional.get(), CategoryDTO.class);
+            return ResponseEntity.ok(categoryDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

@@ -3,6 +3,8 @@ package com.meusboleto.backend.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,15 +26,17 @@ public class Transaction implements Serializable {
     @Column(name="transaction_name")
     private String transactionName;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id",referencedColumnName = "id")
+    //@JsonBackReference
     private Category category;
     
     @Column(name = "description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    //@JsonBackReference
     private User user;
 
     @Column(name = "created_at")

@@ -1,13 +1,18 @@
 package com.meusboleto.backend.rest;
 
+import com.meusboleto.backend.DTO.TransactionDTO;
 import com.meusboleto.backend.model.Transaction;
 import com.meusboleto.backend.repository.TransactionRepository;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -16,15 +21,25 @@ public class TransactionController {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private ModelMapper mapper;
+
     @GetMapping
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
+        List<Transaction>  transactionsOptional = transactionRepository.findAll();
+        List<TransactionDTO> transactionDTO = transactionsOptional.stream().map(e -> mapper.map(e, TransactionDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(transactionDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable int id) {
+    public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable int id) {
         Optional<Transaction> transaction = transactionRepository.findById(id);
-        return transaction.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        if (transaction.isPresent()){
+            TransactionDTO transactionDTO = mapper.map(transaction.get(), TransactionDTO.class);
+            return ResponseEntity.ok(transactionDTO);
+        }else{
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
