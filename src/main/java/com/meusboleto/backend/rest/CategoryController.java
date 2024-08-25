@@ -1,20 +1,24 @@
 package com.meusboleto.backend.rest;
 
-import com.meusboleto.backend.DTO.CategoryDTO;
-import com.meusboleto.backend.DTO.UserDTO;
-import com.meusboleto.backend.model.Category;
-import com.meusboleto.backend.repository.CategoryRepository;
-import com.meusboleto.backend.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import com.meusboleto.backend.DTO.CategoryDTO;
+import com.meusboleto.backend.model.Category;
+import com.meusboleto.backend.repository.CategoryRepository;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -23,8 +27,6 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    private UserRepository userRepository;
-
     @Autowired
     private ModelMapper mapper;
 
@@ -32,8 +34,8 @@ public class CategoryController {
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
 
-        List<CategoryDTO> categoryDTO = categories.stream().map( e -> mapper.map(e, CategoryDTO.class)).collect(Collectors.toList());
-        return ResponseEntity.ok(categoryDTO);
+        List<CategoryDTO> categoriesDTO = categories.stream().map( e -> mapper.map(e, CategoryDTO.class)).collect(Collectors.toList());
+        return ResponseEntity.ok(categoriesDTO);
     }
 
     @GetMapping("/{id}")
@@ -47,6 +49,7 @@ public class CategoryController {
         }
     }
 
+    //TODO - CREATE 
     @PostMapping
     public Category createCategory(@RequestBody Category category) {
         return categoryRepository.save(category);

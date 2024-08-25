@@ -1,9 +1,8 @@
 package com.meusboleto.backend.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,8 +13,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 @Entity
-@Table(name="transaction")
+@Table(name="transaction", uniqueConstraints= {
+    @UniqueConstraint(columnNames={"category_id", "month_data_id", "user_id"})
+})
 public class Transaction implements Serializable {
 
     @Id
@@ -39,11 +41,62 @@ public class Transaction implements Serializable {
     //@JsonBackReference
     private User user;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "month_data_id", referencedColumnName = "id")
+    //@JsonBackReference
+    private MonthlyData monthDateId;
+
     @Column(name = "created_at")
     private Date createdAt;
 
     @Column(name = "changed_at")
     private Date changedAt;
+
+    @Column(name = "transaction_value", precision = 19, scale = 2)
+    private BigDecimal transactionValue;
+
+    @Column(name = "transaction_budget", precision = 19, scale = 2)
+    private BigDecimal transactionBudget;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public MonthlyData getMonthDateId() {
+        return monthDateId;
+    }
+
+    public void setMonthDateId(MonthlyData monthDateId) {
+        this.monthDateId = monthDateId;
+    }
+
+    public BigDecimal getTransactionValue() {
+        return transactionValue;
+    }
+
+    public void setTransactionValue(BigDecimal transactionValue) {
+        this.transactionValue = transactionValue;
+    }
+
+    public BigDecimal getTransactionBudget() {
+        return transactionBudget;
+    }
+
+    public void setTransactionBudget(BigDecimal transactionBudget) {
+        this.transactionBudget = transactionBudget;
+    }
+
+    public MonthlyData getMonthlyData(){
+        return monthDateId;
+    }
+
+    public void setMonthlyData(MonthlyData monthlyData) {
+        this.monthDateId = monthlyData;
+    }
 
     public void setId(int id) {
         this.id = id;
