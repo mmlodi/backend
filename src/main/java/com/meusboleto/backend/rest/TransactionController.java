@@ -67,50 +67,21 @@ public class TransactionController {
         return transactions.stream()
                            .map(transaction -> mapper.map(transaction, TransactionDTO.class))
                            .collect(Collectors.toList());
-        // List<Object[]> results = transactionRepository.findAllCategoriesWithTransactionsForUser(userId);
-        // List<TransactionDTO> transactionDTOs = new ArrayList<>();
-
-        // for (Object[] result : results) {
-        //     //Category category = (Category) result[0];
-        //     MonthlyData monthlyData = (MonthlyData) result[1];
-        //     Transaction transaction = (Transaction) result[2];
-
-        //     TransactionDTO transactionDTO = new TransactionDTO();
-        //    // transactionDTO.setCategory(modelMapper.map(category, CategoryDTO.class));
-        //     transactionDTO.setMonthlyData(monthlyData);
-
-        //     if (transaction != null) {
-        //         transactionDTO.setId(transaction.getId());
-        //         transactionDTO.setTransactionName(transaction.getTransactionName());
-        //         transactionDTO.setDescription(transaction.getDescription());
-        //         transactionDTO.setUser(mapper.map(transaction.getUser(), UserDTO.class));
-        //         transactionDTO.setCreatedAt(transaction.getCreatedAt());
-        //         transactionDTO.setChangedAt(transaction.getChangedAt());
-        //         transactionDTO.setTransactionValue(transaction.getTransactionValue());
-        //         transactionDTO.setTransactionBudget(transaction.getTransactionBudget());
-        //     } else {
-        //         transactionDTO.setTransactionName(null);
-        //         transactionDTO.setDescription(null);
-        //         transactionDTO.setUser(null);
-        //         transactionDTO.setCreatedAt(null);
-        //         transactionDTO.setChangedAt(null);
-        //         transactionDTO.setTransactionValue(null);
-        //         transactionDTO.setTransactionBudget(null);
-        //     }
-
-        //     transactionDTOs.add(transactionDTO);
-        // }
-
-        // return transactionDTOs;
     }
 
     @PostMapping
     public ResponseEntity<TransactionDTO> createTransaction(@RequestBody Transaction transaction) {
         // Ensure the MonthlyData entity exists
-        Optional<MonthlyData> monthData = monthlyDataRepository.findById(transaction.getMonthlyData().getId());
+        Integer month = transaction.getMonthlyData().getMonth();
+        Integer year = transaction.getMonthlyData().getYear();
+    
+        // Find the MonthlyData entity using month and year
+        Optional<MonthlyData> monthData = monthlyDataRepository.findByMonthAndYear(month, year);
         if (!monthData.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
+    
+        // Set the found MonthlyData in the transaction
         transaction.setMonthlyData(monthData.get());
 
         // Save the transaction
