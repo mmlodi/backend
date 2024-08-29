@@ -2,6 +2,7 @@ package com.meusboleto.backend.rest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Locale.Category;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.meusboleto.backend.DTO.TransactionDTO;
 import com.meusboleto.backend.model.MonthlyData;
 import com.meusboleto.backend.model.Transaction;
+import com.meusboleto.backend.repository.CategoryRepository;
 import com.meusboleto.backend.repository.MonthlyDataRepository;
 import com.meusboleto.backend.repository.TransactionRepository;
 
@@ -31,6 +33,9 @@ public class TransactionController {
 
     @Autowired
     private MonthlyDataRepository monthlyDataRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private ModelMapper mapper;
@@ -74,15 +79,44 @@ public class TransactionController {
         // Ensure the MonthlyData entity exists
         Integer month = transaction.getMonthlyData().getMonth();
         Integer year = transaction.getMonthlyData().getYear();
+        Integer categoryId = transaction.getCategory().getId();
     
         // Find the MonthlyData entity using month and year
         Optional<MonthlyData> monthData = monthlyDataRepository.findByMonthAndYear(month, year);
         if (!monthData.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
+
+        // Optional<Category> category = categoryRepository.findById(categoryId);
+        // if (!category.isPresent()) {
+        //     return ResponseEntity.badRequest().build();
+        // }
     
         // Set the found MonthlyData in the transaction
         transaction.setMonthlyData(monthData.get());
+        //transaction.setCategory(category.get());
+        // Check if the transaction already exists in the database
+        Optional<Transaction> existingTransaction = transactionRepository.findById(transaction.getId());
+        if (existingTransaction.isPresent()) {
+            Transaction updatedTransaction = transaction;
+
+            updatedTransaction.setTransactionName(transaction.getTransactionName());
+            updatedTransaction.setTransactionType(transaction.getTransactionType());
+            updatedTransaction.setDescription(transaction.getDescription());
+            updatedTransaction.setUser(transaction.getUser());
+            updatedTransaction.setMonthlyData(monthData.get());
+            updatedTransaction.setCreatedAt(transaction.getCreatedAt());
+            updatedTransaction.setChangedAt(transaction.getChangedAt());
+            //updatedTransaction.setCategory(transaction.getCategory());
+
+            Transaction trans = transactionRepository.save(updatedTransaction);
+
+            TransactionDTO transactionDTO = mapper.map(trans, TransactionDTO.class);
+            return ResponseEntity.ok(transactionDTO);
+        } else {
+            // If doesn't exist, save the new transaction
+            transaction = transactionRepository.save(transaction);
+        }
 
         // Save the transaction
         Transaction savedTransaction = transactionRepository.save(transaction);

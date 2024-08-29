@@ -35,10 +35,13 @@ public class Category {
     //@JsonBackReference
     private User user;
 
+    public Category(int id) {
+        this.id = id;
+    }
+    
     public void setId(int id) {
         this.id = id;
     }
-
 
     public CategoryType getTipoCategoria() {
         return tipoCategoria;
@@ -55,9 +58,6 @@ public class Category {
     public void setUser(User user) {
         this.user = user;
     }
-
-
-
 
     public int getId() {
         return id;
