@@ -2,7 +2,6 @@ package com.meusboleto.backend.rest;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Locale.Category;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -76,52 +75,43 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<TransactionDTO> createTransaction(@RequestBody Transaction transaction) {
-        // Ensure the MonthlyData entity exists
         Integer month = transaction.getMonthlyData().getMonth();
         Integer year = transaction.getMonthlyData().getYear();
         Integer categoryId = transaction.getCategory().getId();
     
-        // Find the MonthlyData entity using month and year
-        Optional<MonthlyData> monthData = monthlyDataRepository.findByMonthAndYear(month, year);
-        if (!monthData.isPresent()) {
+        Optional<MonthlyData> monthlyData = monthlyDataRepository.findByMonthAndYear(month, year);
+        if (!monthlyData.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
 
-        // Optional<Category> category = categoryRepository.findById(categoryId);
-        // if (!category.isPresent()) {
-        //     return ResponseEntity.badRequest().build();
-        // }
-    
-        // Set the found MonthlyData in the transaction
-        transaction.setMonthlyData(monthData.get());
-        //transaction.setCategory(category.get());
-        // Check if the transaction already exists in the database
-        Optional<Transaction> existingTransaction = transactionRepository.findById(transaction.getId());
-        if (existingTransaction.isPresent()) {
-            Transaction updatedTransaction = transaction;
+        MonthlyData monthlyDataId = monthlyData.get();
+        
+        Optional<Transaction> existingTransactionOpt = transactionRepository.findByCategoryIdAndMonthlyDataIdAndUserId(categoryId, monthlyDataId.getId(), transaction.getUser().getId());
 
-            updatedTransaction.setTransactionName(transaction.getTransactionName());
-            updatedTransaction.setTransactionType(transaction.getTransactionType());
-            updatedTransaction.setDescription(transaction.getDescription());
-            updatedTransaction.setUser(transaction.getUser());
-            updatedTransaction.setMonthlyData(monthData.get());
-            updatedTransaction.setCreatedAt(transaction.getCreatedAt());
+    
+        transaction.setMonthlyData(monthlyData.get());
+
+        Transaction trans;
+        if (existingTransactionOpt.isPresent()) {
+            Transaction updatedTransaction = existingTransactionOpt.get();
+    
+            //updatedTransaction.setTransactionName(transaction.getTransactionName());
+            //updatedTransaction.setTransactionType(transaction.getTransactionType());
+            //updatedTransaction.setDescription(transaction.getDescription());
+            //updatedTransaction.setUser(transaction.getUser());
+            //updatedTransaction.setMonthlyData(monthlyData.get());
+            //updatedTransaction.setCreatedAt(transaction.getCreatedAt());
+            updatedTransaction.setTransactionValue(transaction.getTransactionValue());
+            updatedTransaction.setTransactionBudget(transaction.getTransactionBudget());
             updatedTransaction.setChangedAt(transaction.getChangedAt());
             //updatedTransaction.setCategory(transaction.getCategory());
-
-            Transaction trans = transactionRepository.save(updatedTransaction);
-
-            TransactionDTO transactionDTO = mapper.map(trans, TransactionDTO.class);
-            return ResponseEntity.ok(transactionDTO);
+    
+            trans = transactionRepository.save(updatedTransaction);
         } else {
-            // If doesn't exist, save the new transaction
-            transaction = transactionRepository.save(transaction);
+            trans = transactionRepository.save(transaction);
         }
-
-        // Save the transaction
-        Transaction savedTransaction = transactionRepository.save(transaction);
-        TransactionDTO transactionDTO = mapper.map(savedTransaction, TransactionDTO.class);
-
+    
+        TransactionDTO transactionDTO = mapper.map(trans, TransactionDTO.class);
         return ResponseEntity.ok(transactionDTO);
     }
 

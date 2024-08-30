@@ -1,6 +1,7 @@
 package com.meusboleto.backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,9 +18,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     //         "ORDER BY m.year, m.month, c.categoryName")
     @Query("SELECT t FROM Transaction t " +
            "JOIN FETCH t.category c " +
-           "JOIN FETCH t.monthDateId m " +
+           "JOIN FETCH t.monthlyData m " +
            "WHERE t.user.id = :userId " +
            "ORDER BY m.year, m.month, c.categoryName")
     List<Transaction> findAllCategoriesWithTransactionsForUser(@Param("userId") int userId);
+
+    Optional<Transaction> findByCategoryIdAndMonthlyDataIdAndUserId(Integer categoryId, Integer monthlyDataId, Integer userId);
 }
 

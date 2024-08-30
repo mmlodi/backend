@@ -44,7 +44,7 @@ public class Transaction implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "month_data_id", referencedColumnName = "id")
     //@JsonBackReference
-    private MonthlyData monthDateId;
+    private MonthlyData monthlyData;
 
     @Column(name = "created_at")
     private Date createdAt;
@@ -66,14 +66,6 @@ public class Transaction implements Serializable {
         this.category = category;
     }
 
-    public MonthlyData getMonthDateId() {
-        return monthDateId;
-    }
-
-    public void setMonthDateId(MonthlyData monthDateId) {
-        this.monthDateId = monthDateId;
-    }
-
     public BigDecimal getTransactionValue() {
         return transactionValue;
     }
@@ -91,11 +83,11 @@ public class Transaction implements Serializable {
     }
 
     public MonthlyData getMonthlyData(){
-        return monthDateId;
+        return monthlyData;
     }
 
     public void setMonthlyData(MonthlyData monthlyData) {
-        this.monthDateId = monthlyData;
+        this.monthlyData = monthlyData;
     }
 
     public void setId(int id) {

@@ -1,7 +1,5 @@
 package com.meusboleto.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,10 +33,9 @@ public class Category {
     //@JsonBackReference
     private User user;
 
-    public Category(int id) {
-        this.id = id;
+    public Category() {
     }
-    
+        
     public void setId(int id) {
         this.id = id;
     }
