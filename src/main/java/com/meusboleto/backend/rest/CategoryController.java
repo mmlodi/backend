@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,10 +50,11 @@ public class CategoryController {
         }
     }
 
-    //TODO - CREATE 
     @PostMapping
-    public Category createCategory(@RequestBody Category category) {
-        return categoryRepository.save(category);
+    public ResponseEntity<CategoryDTO> createCategory(@RequestBody Category category) {
+        Category savedCategory = categoryRepository.save(category);
+        CategoryDTO categoryDTO = mapper.map(savedCategory, CategoryDTO.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryDTO);
     }
 
     @PutMapping("/{id}")

@@ -108,6 +108,7 @@ public class TransactionController {
     
             trans = transactionRepository.save(updatedTransaction);
         } else {
+            //transaction.setId(null);
             trans = transactionRepository.save(transaction);
         }
     
