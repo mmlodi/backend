@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name="category")
 public class Category {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
@@ -34,10 +35,6 @@ public class Category {
     private User user;
 
     public Category() {
-    }
-        
-    public void setId(int id) {
-        this.id = id;
     }
 
     public CategoryType getTipoCategoria() {

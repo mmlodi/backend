@@ -90,10 +90,6 @@ public class Transaction implements Serializable {
         this.monthlyData = monthlyData;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getDescription() {
         return description;
     }

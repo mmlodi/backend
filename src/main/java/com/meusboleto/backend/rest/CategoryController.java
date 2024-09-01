@@ -64,7 +64,6 @@ public class CategoryController {
             Category updatedCategory = category.get();
             updatedCategory.setCategoryName(categoryDetails.getCategoryName());
             updatedCategory.setTipoCategoria(categoryDetails.getTipoCategoria());
-            updatedCategory.setUser(categoryDetails.getUser());
             categoryRepository.save(updatedCategory);
             return ResponseEntity.ok(updatedCategory);
         } else {
