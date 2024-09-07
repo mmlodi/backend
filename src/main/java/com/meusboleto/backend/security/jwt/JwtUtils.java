@@ -51,13 +51,13 @@ public class JwtUtils {
             Jwts.parser().setSigningKey(getSignKey()).build().parseClaimsJws(authToken);
             return true;
         } catch (MalformedJwtException e) {
-            System.out.println("Token Inválido"+e.getMessage());
+            System.out.println("Token Inválido "+e.getMessage());
         } catch (ExpiredJwtException e) {
-            System.out.println("Token Expirado"+e.getMessage());
+            System.out.println("Token Expirado "+e.getMessage());
         } catch (UnsupportedJwtException e) {
-            System.out.println("Token Não suportado"+e.getMessage());
+            System.out.println("Token Não suportado "+e.getMessage());
         } catch (IllegalArgumentException e) {
-            System.out.println("Token Expirado"+e.getMessage());
+            System.out.println("Token Ilegal "+e.getMessage());
         }
 
         return false;

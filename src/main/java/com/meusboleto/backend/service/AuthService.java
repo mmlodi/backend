@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import com.meusboleto.backend.DTO.AccessDTO;
@@ -20,27 +21,41 @@ public class AuthService {
 	private JwtUtils jwtUtils;
 	
 	public AccessDTO login(AuthenticationDTO authDto) {
-		
 		try {
-		//Cria mecanismo de credencial para o spring
-		UsernamePasswordAuthenticationToken userAuth = 
-				new UsernamePasswordAuthenticationToken(authDto.getUsername(), authDto.getPassword());
-		
-		//Prepara mecanismo para autenticacao
-		Authentication authentication = authenticatioManager.authenticate(userAuth);
-		
-		//Busca usuario logado
-		UserDetailsImpl userAuthenticate = (UserDetailsImpl)authentication.getPrincipal();
-		
-		String token = jwtUtils.generateTokenFromUserDetailsImplementation(userAuthenticate);
-		
-		AccessDTO accessDto = new AccessDTO(token);
-		
-		return accessDto;
-		
-		}catch(BadCredentialsException e) {
-			//TODO LOGIN OU SENHA INVALIDO
+			// Cria mecanismo de credencial para o Spring
+			UsernamePasswordAuthenticationToken userAuth = 
+					new UsernamePasswordAuthenticationToken(authDto.getUsername(), authDto.getPassword());
+	
+			// Prepara mecanismo para autenticacao
+			Authentication authentication = authenticatioManager.authenticate(userAuth);
+	
+			// Busca usuario logado
+			UserDetailsImpl userAuthenticate = (UserDetailsImpl) authentication.getPrincipal();
+	
+			// Gera o token JWT
+			String token = jwtUtils.generateTokenFromUserDetailsImplementation(userAuthenticate);
+			
+			AccessDTO accessDTO = new AccessDTO(
+				userAuthenticate.getId()
+				, userAuthenticate.getEmail()
+				, userAuthenticate.getUsername()
+				, token);
+			// Retorna o token no AccessDTO
+			return accessDTO;
+	
+		} catch (BadCredentialsException e) {
+			// Logando o erro para depuração
+			System.err.println("Login failed: Invalid username or password");
+		} catch (AuthenticationException e) {
+			// Para outros tipos de falhas de autenticação
+			System.err.println("Authentication failed: " + e.getMessage());
+		} catch (Exception e) {
+			// Captura geral para qualquer outro tipo de exceção
+			System.err.println("An error occurred during login: " + e.getMessage());
 		}
-		return new AccessDTO("Acesso negado");
+	
+		// Em caso de falha de autenticação, retorna acesso negado
+		return new AccessDTO();
 	}
+
 }

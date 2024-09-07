@@ -50,6 +50,20 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CategoryDTO>> getCategoryByUserId(@PathVariable int userId) {
+        List<CategoryDTO> category = getAllCategoriesFromUser(userId);
+        return ResponseEntity.ok(category);
+    }
+
+    public List<CategoryDTO> getAllCategoriesFromUser(int userId) {
+        List<Category> categories = categoryRepository.findByUserId(userId);
+
+        return categories.stream()
+            .map(category -> mapper.map(category, CategoryDTO.class))
+            .collect(Collectors.toList());
+    }
+
     @PostMapping
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody Category category) {
         Category savedCategory = categoryRepository.save(category);

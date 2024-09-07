@@ -56,8 +56,9 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User u = mapper.map(user, User.class);
 
+        u.setSenha(passwordEncoder.encode(u.getSenha()));
         User usu = mapper.map(userRepository.save(u), User.class);
-        usu.setSenha(passwordEncoder.encode(usu.getSenha()));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(usu) ;
     }
 
