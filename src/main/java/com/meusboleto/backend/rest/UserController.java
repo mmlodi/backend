@@ -67,10 +67,10 @@ public class UserController {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             User updatedUser = user.get();
-            updatedUser.setUserName(userDetails.getUserName());
-            updatedUser.setSenha(userDetails.getSenha());
+            //updatedUser.setUserName(userDetails.getUserName());
+            updatedUser.setSenha(passwordEncoder.encode(userDetails.getSenha()));
             updatedUser.setEmail(userDetails.getEmail());
-            updatedUser.setCreatedAt(userDetails.getCreatedAt());
+            //updatedUser.setCreatedAt(userDetails.getCreatedAt());
             updatedUser.setChangedAt(userDetails.getChangedAt());
             userRepository.save(updatedUser);
             return ResponseEntity.ok(updatedUser);
