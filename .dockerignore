@@ -1,0 +1,9 @@
+target
+logs
+.git
+.gitignore
+.env
+.mvn
+mvnw
+mvnw.cmd
+HELP.md
