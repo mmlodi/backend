@@ -3,8 +3,10 @@ package com.meusboleto.backend.security;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -26,6 +28,9 @@ public class WebSecurityConfig {
 
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
+
+	@Value("${projeto.cors.allowed-origins}")
+	private String allowedOrigins;
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -51,7 +56,7 @@ public class WebSecurityConfig {
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
-											.requestMatchers("/api/users").permitAll()
+											.requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 											.anyRequest().authenticated());
 		
 		http.addFilterBefore(authFilterToken(), UsernamePasswordAuthenticationFilter.class);
@@ -62,7 +67,7 @@ public class WebSecurityConfig {
 	@Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Allow specific origin
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed methods
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type")); // Allowed headers
         config.setExposedHeaders(Arrays.asList("Authorization")); // Expose headers

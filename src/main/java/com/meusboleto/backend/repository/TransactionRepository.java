@@ -24,5 +24,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     List<Transaction> findAllCategoriesWithTransactionsForUser(@Param("userId") int userId);
 
     Optional<Transaction> findByCategoryIdAndMonthlyDataIdAndUserId(Integer categoryId, Integer monthlyDataId, Integer userId);
+
+    Optional<Transaction> findByIdAndUserId(Integer id, Integer userId);
 }
 
